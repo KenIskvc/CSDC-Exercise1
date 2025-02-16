@@ -6,11 +6,12 @@ import java.util.List;
 public class Movie {
     private String title;
     private String description;
-    // TODO add more properties here
+    private List<Genre> genres;
 
-    public Movie(String title, String description) {
+    public Movie(String title, String description, List<Genre> genres) {
         this.title = title;
         this.description = description;
+        this.genres=genres;
     }
 
     public String getTitle() {
@@ -21,9 +22,18 @@ public class Movie {
         return description;
     }
 
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
     public static List<Movie> initializeMovies(){
         List<Movie> movies = new ArrayList<>();
-        // TODO add some dummy data here
+
+        movies.add(new Movie(
+                "Forrest Gump",
+                "The presidencies of Kennedy and Johnson, Vietnam, Watergate, and other history unfold through the perspective of an Alabama man with an IQ of 75.",
+                List.of(Genre.DRAMA, Genre.ROMANCE)));
+
 
         return movies;
     }
