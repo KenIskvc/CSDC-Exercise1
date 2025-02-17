@@ -35,6 +35,7 @@ public class Movie {
                 List.of(Genre.DRAMA, Genre.ROMANCE)));
 
 
+
         return movies;
     }
 }
