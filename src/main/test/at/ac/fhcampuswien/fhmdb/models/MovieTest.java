@@ -57,8 +57,8 @@ class MovieTest {
         List<Movie> movies = Movie.initializeMovies();
 
         // Assert
-        assertNotNull(movies, "Die Liste sollte nicht null sein.");
-        assertFalse(movies.isEmpty(), "Die Liste sollte mindestens einen Film enthalten.");
+        assertNotNull(movies, "Wird verwendet, um sicherzustellen, dass eine Referenz auf ein Objekt existiert.");
+        assertFalse(movies.isEmpty(), "Wird verwendet, um sicherzustellen, dass eine Collection mindestens ein Element enthält.");
     }
 
     @Test
