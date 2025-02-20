@@ -28,7 +28,7 @@ public class Movie {
 
     public static List<Movie> initializeMovies(){
         List<Movie> movies = new ArrayList<>();
-
+        // Dummy Movies hinzugefügt
         movies.add(new Movie(
                 "Forrest Gump",
                 "The presidencies of Kennedy and Johnson, Vietnam, Watergate, and other history unfold through the perspective of an Alabama man with an IQ of 75.",

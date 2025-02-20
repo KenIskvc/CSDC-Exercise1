@@ -12,5 +12,11 @@ public enum Genre {
 
     public static ArrayList<Genre> getGenres() {
         return new ArrayList<>(Arrays.asList(values()));
+        /*
+        Verwendung der getGenres Methode, z.B. mit sout:
+        ArrayList<Genre> genres = Genre.getGenres();
+        System.out.println(genres);
+
+         */
     }
 }
