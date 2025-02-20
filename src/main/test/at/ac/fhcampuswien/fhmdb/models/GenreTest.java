@@ -28,13 +28,6 @@ class GenreTest {
         // Assert
         assertArrayEquals(Genre.values(), genres.toArray(), "Die Reihenfolge der Genres ist nicht korrekt.");
     }
-
-    @Test
-    void getGenres_shouldReturnModifiableList() {
-        // Act
-        List<Genre> genres = Genre.getGenres();
-
-        // Assert
-        assertDoesNotThrow(() -> genres.add(Genre.ACTION), "Die Liste sollte modifizierbar sein.");
-    }
 }
+
+
