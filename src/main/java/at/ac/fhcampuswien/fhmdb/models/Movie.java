@@ -1,5 +1,9 @@
 package at.ac.fhcampuswien.fhmdb.models;
 
+import org.w3c.dom.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,84 +11,68 @@ public class Movie {
     private String title;
     private String description;
     private List<Genre> genres;
+    private int releaseYear;
+    private double rating;
 
-    public Movie(String title, String description, List<Genre> genres) {
+    public Movie(String title, String description, List<Genre> genres, int releaseYear, double rating) {
         this.title = title;
         this.description = description;
-        this.genres=genres;
+        this.genres = genres;
+        this.releaseYear = releaseYear;
+        this.rating = rating;
     }
 
-    public String getTitle() {
-        return title;
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public List<Genre> getGenres() { return genres; }
+    public int getReleaseYear() { return releaseYear; }
+    public double getRating() { return rating; }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%d) - %.1f⭐\n%s\nGenres: %s",
+                title, releaseYear, rating, description, genres);
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public List<Genre> getGenres() {
-        return genres;
-    }
-
-    public static List<Movie> initializeMovies(){
+    public static List<Movie> loadMoviesFromXml() {
         List<Movie> movies = new ArrayList<>();
-        // Dummy Movies hinzugefügt
-        movies.add(new Movie(
-                "Forrest Gump",
-                "The presidencies of Kennedy and Johnson, Vietnam, Watergate, and other history unfold through the perspective of an Alabama man with an IQ of 75.",
-                List.of(Genre.DRAMA, Genre.ROMANCE)));
-        movies.add(new Movie(
-                "The Shawshank Redemption",
-                "Two imprisoned men bond over several years, finding solace and eventual redemption through acts of common decency.",
-                List.of(Genre.DRAMA)
-        ));
+        try {
+            // Pfad zur movies.xml anpassen (direkt im `models`-Ordner)
+            File xmlFile = new File("src/main/java/at/ac/fhcampuswien/fhmdb/models/movies.xml");
+            if (!xmlFile.exists()) {
+                throw new RuntimeException("movies.xml not found in models folder.");
+            }
 
-        movies.add(new Movie(
-                "Inception",
-                "A thief who enters the dreams of others to steal secrets must plant an idea into a target's subconscious.",
-                List.of(Genre.ACTION, Genre.SCI_FI, Genre.THRILLER)
-        ));
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(xmlFile);
+            document.getDocumentElement().normalize();
 
-        movies.add(new Movie(
-                "The Godfather",
-                "The aging patriarch of an organized crime dynasty transfers control to his reluctant son.",
-                List.of(Genre.DRAMA, Genre.CRIME)
-        ));
+            NodeList nodeList = document.getElementsByTagName("movie");
 
-        movies.add(new Movie(
-                "Titanic",
-                "A young couple from different social classes fall in love aboard the ill-fated RMS Titanic.",
-                List.of(Genre.ROMANCE, Genre.DRAMA)
-        ));
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
 
-        movies.add(new Movie(
-                "The Dark Knight",
-                "When the Joker emerges from Gotham's underworld, Batman must navigate moral dilemmas to stop him.",
-                List.of(Genre.ACTION, Genre.CRIME, Genre.DRAMA)
-        ));
-        movies.add(new Movie(
-                "Pulp Fiction",
-                "The lives of two hitmen, a boxer, a gangster's wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
-                List.of(Genre.CRIME, Genre.DRAMA)
-        ));
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
 
-        movies.add(new Movie(
-                "Interstellar",
-                "A team of explorers travels through a wormhole in space in an attempt to ensure humanity's survival.",
-                List.of(Genre.SCI_FI, Genre.DRAMA, Genre.ADVENTURE)
-        ));
+                    String title = element.getElementsByTagName("title").item(0).getTextContent();
+                    String description = element.getElementsByTagName("description").item(0).getTextContent();
+                    int releaseYear = Integer.parseInt(element.getElementsByTagName("releaseYear").item(0).getTextContent());
+                    double rating = Double.parseDouble(element.getElementsByTagName("rating").item(0).getTextContent());
 
-        movies.add(new Movie(
-                "Schindler's List",
-                "In German-occupied Poland during World War II, industrialist Oskar Schindler saves the lives of more than a thousand Jewish refugees by employing them in his factories.",
-                List.of(Genre.DRAMA, Genre.HISTORY)
-        ));
+                    List<Genre> genres = new ArrayList<>();
+                    NodeList genreNodes = element.getElementsByTagName("genre");
+                    for (int j = 0; j < genreNodes.getLength(); j++) {
+                        genres.add(Genre.valueOf(genreNodes.item(j).getTextContent()));
+                    }
 
-
-
-
-
-
+                    movies.add(new Movie(title, description, genres, releaseYear, rating));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return movies;
     }
 }
