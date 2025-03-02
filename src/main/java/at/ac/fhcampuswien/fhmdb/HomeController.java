@@ -40,7 +40,7 @@ public class HomeController implements Initializable {
 
     private List<Movie> allMovies = Movie.initializeMovies();
     private final ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
-    private boolean ascending = true;
+    private boolean ascending = false;
     private boolean animationEnabled = true; // ⚡ Neue Option zum Deaktivieren der Animation für Tests
 
     @Override
@@ -83,7 +83,7 @@ public class HomeController implements Initializable {
             sortComboBox.setPromptText("Sort movies");
             //sortComboBox.setValue("Title");
             sortComboBox.setOnAction(event -> {
-                ascending = true;
+                ascending = false;
                 sortBtn.setText("Sort");
 //                sortMovies();
 //                if (animationEnabled) animateMovies();
@@ -92,14 +92,14 @@ public class HomeController implements Initializable {
 
         if (sortBtn != null) {
             sortBtn.setOnMouseClicked(event -> {
-                sortMovies(ascending);
-                sortBtn.setText(ascending ? "Sort (Desc)" : "Sort (Asc)");
                 ascending = !ascending;
+                sortBtn.setText(ascending ? "Sort (Desc)" : "Sort (Asc)");
+                sortMovies();
 //                if (animationEnabled) animateMovies();
             });
         }
 
-        genreComboBox.getItems().add("All");
+        genreComboBox.getItems().add("ALL");
         for (Genre genre : Genre.values()) {
                 genreComboBox.getItems().add(genre.name());
         }
@@ -119,31 +119,31 @@ public class HomeController implements Initializable {
 
     }
 
-    public void sortMovies(boolean order) {
+    public void sortMovies() {
         if (sortComboBox == null  || sortComboBox.getValue() == null) return;
         MovieSorter.SortBy selectedSort = switch (sortComboBox.getValue()) {
             case "Rating" -> MovieSorter.SortBy.RATING;
             case "Release Year" -> MovieSorter.SortBy.RELEASE_YEAR;
             default -> MovieSorter.SortBy.TITLE;
         };
-        MovieSorter.sortMovies(observableMovies, selectedSort, order);
+        MovieSorter.sortMovies(observableMovies, selectedSort, ascending);
         if (animationEnabled) animateMovies();
     }
 
     public void filterMovies() {
         if (genreComboBox == null || searchField == null) return;
-        String selectedGenre = genreComboBox.getValue() == null ? "All" : genreComboBox.getValue();
+        String selectedGenre = genreComboBox.getValue() == null ? "ALL" : genreComboBox.getValue();
         String searchQuery = searchField.getText().trim().toLowerCase();
 
         List<Movie> filtered = allMovies.stream()
-                .filter(movie -> selectedGenre.equals("All") || movie.getGenres().contains(Genre.valueOf(selectedGenre)))
+                .filter(movie -> selectedGenre.equals("ALL") || movie.getGenres().contains(Genre.valueOf(selectedGenre)))
                 .filter(movie -> searchQuery.isEmpty() ||
-                        movie.getTitle().toLowerCase().contains(searchQuery))
-//                        movie.getDescription().toLowerCase().contains(searchQuery))
+                        movie.getTitle().toLowerCase().contains(searchQuery) ||
+                        movie.getDescription().toLowerCase().contains(searchQuery))
                 .collect(Collectors.toList());
 
         observableMovies.setAll(filtered);
-        sortMovies(!ascending);
+        sortMovies();
     }
 
     public void resetMovies() {
@@ -184,13 +184,13 @@ public class HomeController implements Initializable {
         return observableMovies;
     }
 
-//    public void setSorting(String sortBy, boolean ascending) {
-//        if (sortComboBox != null) {
-//            sortComboBox.setValue(sortBy);
-//        }
-//        this.ascending = ascending;
-//        sortMovies();
-//    }
+    public void setSorting(String sortBy, boolean ascending) {
+        if (sortComboBox != null) {
+            sortComboBox.setValue(sortBy);
+        }
+        this.ascending = ascending;
+        sortMovies();
+    }
 
     public void disableAnimationForTests() {
         this.animationEnabled = false;
