@@ -26,6 +26,12 @@ public class Movie {
     public int getReleaseYear() { return releaseYear; }
     public double getRating() { return rating; }
 
+    /**
+     * Initializes a list of movies with randomly generated data.
+     * Each movie has a title, description, genres, release year, and rating.
+     *
+     * @return List of randomly generated movies
+     */
     public static List<Movie> initializeMovies(){
         List<Movie> movies = new ArrayList<>();
         Random rdm = new Random();
@@ -44,6 +50,12 @@ public class Movie {
         return movies;
     }
 
+    /**
+     * Generates a random list of genres without repetition.
+     *
+     * @param size of genres to generate
+     * @return List of random genres
+     */
     public static List<Genre> getRandomGenres(int size) {
         Random rdm = new Random();
         List<Genre> allGenres = new ArrayList<>(Genre.getGenres());

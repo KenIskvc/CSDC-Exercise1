@@ -62,6 +62,10 @@ public class HomeController implements Initializable {
         this.allMovies = movies;
     }
 
+    /**
+     * Initializes the UI components and sets up event listeners.
+     * This method configures ComboBoxes, Buttons, and TextFields with their respective actions.
+     */
     private void setupUI() {
 
         if (sortComboBox != null) {
@@ -101,6 +105,10 @@ public class HomeController implements Initializable {
         }
     }
 
+    /**
+     * Sorts movies based on the selected sorting option and order.
+     * If no option is selected, the method returns without sorting.
+     */
     public void sortMovies() {
         if (sortComboBox == null  || sortComboBox.getValue() == null) return;
         MovieSorter.SortBy selectedSort = switch (sortComboBox.getValue()) {
@@ -112,10 +120,14 @@ public class HomeController implements Initializable {
         if (animationEnabled) animateMovies();
     }
 
+    /**
+     * Filters movies based on the selected genre and search query.
+     * Applies sorting after filtering.
+     */
     public void filterMovies() {
         if (genreComboBox == null || searchField == null) return;
         String selectedGenre = genreComboBox.getValue() == null ? "ALL" : genreComboBox.getValue();
-        String searchQuery = searchField.getText().trim().toLowerCase();
+        String searchQuery = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
 
         List<Movie> filtered = allMovies.stream()
                 .filter(movie -> selectedGenre.equals("ALL") || movie.getGenres().contains(Genre.valueOf(selectedGenre)))
@@ -128,6 +140,9 @@ public class HomeController implements Initializable {
         sortMovies();
     }
 
+    /**
+     * Resets movies list, clears selections, and restores the default ascending sorting order.
+     */
     public void resetMovies() {
         ascending = true;
         sortBtn.setText("Sort");
@@ -162,24 +177,12 @@ public class HomeController implements Initializable {
         });
     }
 
-    public List<Movie> getAllMovies() {
-        return allMovies;
-    }
-
-    public void setAllMovies(List<Movie> allMovies) {
-        this.allMovies = allMovies;
-    }
-
     public ObservableList<Movie> getObservableMovies() {
         return observableMovies;
     }
 
-    public void setSorting(String sortBy, boolean ascending) {
-        if (sortComboBox != null) {
-            sortComboBox.setValue(sortBy);
-        }
+    public void setAscending(boolean ascending) {
         this.ascending = ascending;
-        sortMovies();
     }
 
     public void disableAnimationForTests() {
