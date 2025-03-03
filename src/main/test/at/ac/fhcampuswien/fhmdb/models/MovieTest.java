@@ -13,7 +13,7 @@ class MovieTest {
 
     @BeforeEach
     void setUp() {
-        movies = Movie.loadMoviesFromXml();
+        movies = Movie.initializeMovies();
     }
 
     @Test

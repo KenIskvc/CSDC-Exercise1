@@ -1,10 +1,6 @@
 package at.ac.fhcampuswien.fhmdb.models;
 
 import net.datafaker.Faker;
-import org.w3c.dom.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -60,48 +56,7 @@ public class Movie {
         }
         return randomGenres;
     }
-
-    public static List<Movie> loadMoviesFromXml() {
-        List<Movie> movies = new ArrayList<>();
-        try {
-            File xmlFile = new File("src/main/resources/at/ac/fhcampuswien/fhmdb/movies.xml");
-            if (!xmlFile.exists()) {
-                throw new RuntimeException("movies.xml not found. Please check the location of the XML file or if it exists.");
-            }
-
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(xmlFile);
-            document.getDocumentElement().normalize();
-
-            NodeList nodeList = document.getElementsByTagName("movie");
-
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                    Element element = (Element) node;
-
-                    String title = element.getElementsByTagName("title").item(0).getTextContent();
-                    String description = element.getElementsByTagName("description").item(0).getTextContent();
-                    int releaseYear = Integer.parseInt(element.getElementsByTagName("releaseYear").item(0).getTextContent());
-                    double rating = Double.parseDouble(element.getElementsByTagName("rating").item(0).getTextContent());
-
-                    List<Genre> genres = new ArrayList<>();
-                    NodeList genreNodes = element.getElementsByTagName("genre");
-                    for (int j = 0; j < genreNodes.getLength(); j++) {
-                        genres.add(Genre.valueOf(genreNodes.item(j).getTextContent()));
-                    }
-
-                    movies.add(new Movie(title, description, genres, releaseYear, rating));
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return movies;
-    }
-
+    
     @Override
     public String toString() {
         return String.format("%s (%d) - %.1f⭐\n%s\nGenres: %s",

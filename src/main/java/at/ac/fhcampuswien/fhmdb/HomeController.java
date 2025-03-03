@@ -45,48 +45,31 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //loadMovies(Movie.loadMoviesFromXml());
         initializeMovies();
         setupUI();
         if (animationEnabled) animateMovies();
-
     }
 
     public void initializeMovies() {
-        observableMovies.addAll(allMovies);         // add dummy data to observable list
-        // initialize UI stuff
-        movieListView.setItems(observableMovies);   // set data of observable list to list view
-        movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
-    }
-
-    public void loadMovies(List<Movie> movies) {
-        this.allMovies = movies;
-        observableMovies.setAll(allMovies);
+        observableMovies.addAll(allMovies);
         if (movieListView != null) {
             movieListView.setItems(observableMovies);
             movieListView.setCellFactory(movieListView -> new MovieCell());
         }
     }
 
+    public void loadMovies(List<Movie> movies) {
+        this.allMovies = movies;
+    }
+
     private void setupUI() {
-//        if (genreComboBox != null) {
-//            genreComboBox.getItems().add("Alle Genres");
-//            for (Genre genre : Genre.values()) {
-//                genreComboBox.getItems().add(genre.name());
-//            }
-//            genreComboBox.setValue("Alle Genres");
-//            genreComboBox.setOnAction(event -> filterMovies());
-//        }
 
         if (sortComboBox != null) {
             sortComboBox.getItems().addAll("Title", "Rating", "Release Year");
             sortComboBox.setPromptText("Sort movies");
-            //sortComboBox.setValue("Title");
             sortComboBox.setOnAction(event -> {
                 ascending = false;
                 sortBtn.setText("Sort");
-//                sortMovies();
-//                if (animationEnabled) animateMovies();
             });
         }
 
@@ -95,20 +78,12 @@ public class HomeController implements Initializable {
                 ascending = !ascending;
                 sortBtn.setText(ascending ? "Sort (Desc)" : "Sort (Asc)");
                 sortMovies();
-//                if (animationEnabled) animateMovies();
             });
         }
-
-        genreComboBox.getItems().add("ALL");
-        for (Genre genre : Genre.values()) {
-                genreComboBox.getItems().add(genre.name());
-        }
-        genreComboBox.setOnAction(event -> filterMovies());
 
         if (searchField != null) {
             searchField.textProperty().addListener((observable, oldValue, newValue) -> {
                 filterMovies();
-//                if (animationEnabled) animateMovies();
             });
         }
 
@@ -117,6 +92,13 @@ public class HomeController implements Initializable {
             if (animationEnabled) animateMovies();
         });
 
+        if (genreComboBox != null) {
+            genreComboBox.getItems().add("ALL");
+            for (Genre genre : Genre.values()) {
+                genreComboBox.getItems().add(genre.name());
+            }
+            genreComboBox.setOnAction(event -> filterMovies());
+        }
     }
 
     public void sortMovies() {
@@ -178,6 +160,14 @@ public class HomeController implements Initializable {
                 fade.play();
             }
         });
+    }
+
+    public List<Movie> getAllMovies() {
+        return allMovies;
+    }
+
+    public void setAllMovies(List<Movie> allMovies) {
+        this.allMovies = allMovies;
     }
 
     public ObservableList<Movie> getObservableMovies() {
