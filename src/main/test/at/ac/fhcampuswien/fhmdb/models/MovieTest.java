@@ -57,12 +57,14 @@ class MovieTest {
     @Test
     void testGetRandomGenres_noDuplicates() {
         int requestedSize = 5;
+
+        // Falls Genre.size < requested size
         List<Genre> allGenres = Genre.getGenres();
         int maxSize = Math.min(requestedSize, allGenres.size());
 
         List<Genre> randomGenres = Movie.getRandomGenres(maxSize);
 
-        assertEquals(maxSize, randomGenres.size(), "Die Genre-Liste sollte keine Duplikate haben.");
+        assertEquals(maxSize, randomGenres.size(), "Die Größe sollte übereinstimmen.");
         assertEquals(randomGenres.stream().distinct().count(), randomGenres.size(), "Die Genres sollten einzigartig sein.");
     }
 }
