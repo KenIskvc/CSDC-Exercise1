@@ -16,76 +16,55 @@ class MovieTest {
         movies = Movie.initializeMovies();
     }
 
+
+    // Tester für die neue Movieklasse
     @Test
-    void movieConstructor_shouldInitializeFieldsCorrectly() {
-        // Arrange
-        String expectedTitle = "Inception";
-        String expectedDescription = "A thief who enters dreams to steal secrets must plant an idea.";
-        List<Genre> expectedGenres = List.of(Genre.ACTION, Genre.SCI_FI, Genre.THRILLER);
-        int expectedYear = 2010;
-        double expectedRating = 8.8;
-
-        // Act
-        Movie movie = new Movie(expectedTitle, expectedDescription, expectedGenres, expectedYear, expectedRating);
-
-        // Assert
-        assertEquals(expectedTitle, movie.getTitle(), "Der Titel stimmt nicht überein.");
-        assertEquals(expectedDescription, movie.getDescription(), "Die Beschreibung stimmt nicht überein.");
-        assertEquals(expectedGenres, movie.getGenres(), "Die Genres stimmen nicht überein.");
-        assertEquals(expectedYear, movie.getReleaseYear(), "Das Erscheinungsjahr stimmt nicht überein.");
-        assertEquals(expectedRating, movie.getRating(), 0.1, "Die Bewertung stimmt nicht überein.");
+    void testInitializeMovies_size() {
+        List<Movie> movies = Movie.initializeMovies();
+        assertNotNull(movies, "Die Movie-Liste sollte nicht null sein.");
+        assertEquals(35, movies.size(), "Die Movie-Liste sollte genau 35 Filme enthalten.");
     }
 
     @Test
-    void getTitle_shouldReturnCorrectTitle() {
-        Movie movie = new Movie("Titanic", "A love story on the Titanic.", List.of(Genre.ROMANCE, Genre.DRAMA), 1997, 7.8);
-        assertEquals("Titanic", movie.getTitle(), "Der Titel ist nicht korrekt.");
+    void testInitializeMovies_movieFields() {
+        List<Movie> movies = Movie.initializeMovies();
+        assertFalse(movies.isEmpty(), "Die Movie-Liste sollte nicht leer sein.");
+
+        Movie movie = movies.get(0);
+
+        assertNotNull(movie.getTitle(), "Der Titel darf nicht null sein.");
+        assertFalse(movie.getTitle().isEmpty(), "Der Titel darf nicht leer sein.");
+
+        assertNotNull(movie.getDescription(), "Die Beschreibung darf nicht null sein.");
+        assertFalse(movie.getDescription().isEmpty(), "Die Beschreibung darf nicht leer sein.");
+
+        assertNotNull(movie.getGenres(), "Genres dürfen nicht null sein.");
+        assertTrue(movie.getGenres().size() >= 1 && movie.getGenres().size() <= 3, "Ein Film sollte 1 bis 3 Genres haben.");
+
+        assertTrue(movie.getReleaseYear() >= 1980 && movie.getReleaseYear() <= 2025, "Das Erscheinungsjahr sollte zwischen 1980 und 2025 liegen.");
+
+        assertTrue(movie.getRating() >= 4.0 && movie.getRating() <= 10.0, "Das Rating sollte zwischen 4.0 und 10.0 liegen.");
     }
 
     @Test
-    void getDescription_shouldReturnCorrectDescription() {
-        Movie movie = new Movie("Titanic", "A love story on the Titanic.", List.of(Genre.ROMANCE, Genre.DRAMA), 1997, 7.8);
-        assertEquals("A love story on the Titanic.", movie.getDescription(), "Die Beschreibung ist nicht korrekt.");
+    void testGetRandomGenres_size() {
+        int requestedSize = 2;
+        List<Genre> genres = Movie.getRandomGenres(requestedSize);
+        assertNotNull(genres, "Die Genre-Liste sollte nicht null sein.");
+        assertEquals(requestedSize, genres.size(), "Die Genre-Liste sollte genau " + requestedSize + " Genres enthalten.");
     }
 
     @Test
-    void getGenres_shouldReturnCorrectGenres() {
-        List<Genre> expectedGenres = List.of(Genre.ROMANCE, Genre.DRAMA);
-        Movie movie = new Movie("Titanic", "A love story on the Titanic.", expectedGenres, 1997, 7.8);
-        assertEquals(expectedGenres, movie.getGenres(), "Die Genres sind nicht korrekt.");
-    }
+    void testGetRandomGenres_noDuplicates() {
+        int requestedSize = 5;
+        List<Genre> allGenres = Genre.getGenres();
+        int maxSize = Math.min(requestedSize, allGenres.size());
 
-    @Test
-    void getReleaseYear_shouldReturnCorrectYear() {
-        Movie movie = new Movie("Titanic", "A love story on the Titanic.", List.of(Genre.ROMANCE, Genre.DRAMA), 1997, 7.8);
-        assertEquals(1997, movie.getReleaseYear(), "Das Erscheinungsjahr ist nicht korrekt.");
-    }
+        List<Genre> randomGenres = Movie.getRandomGenres(maxSize);
 
-    @Test
-    void getRating_shouldReturnCorrectRating() {
-        Movie movie = new Movie("Titanic", "A love story on the Titanic.", List.of(Genre.ROMANCE, Genre.DRAMA), 1997, 7.8);
-        assertEquals(7.8, movie.getRating(), 0.1, "Die Bewertung ist nicht korrekt.");
-    }
-
-    @Test
-    void loadMoviesFromXml_shouldReturnNonEmptyList() {
-        assertNotNull(movies, "Die Liste darf nicht null sein.");
-        assertFalse(movies.isEmpty(), "Die Liste sollte nicht leer sein.");
-    }
-
-    @Test
-    void loadMoviesFromXml_shouldContainSpecificMovie() {
-        boolean containsInception = movies.stream()
-                .anyMatch(m -> m.getTitle().equals("Demon Slayer: Mugen Train") && m.getGenres().contains(Genre.ANIMATION));
-
-        assertTrue(containsInception, "Die Liste sollte 'Demon Slayer: Mugen Train' mit dem Genre ANIMATION enthalten.");
-    }
-
-    @Test
-    void loadMoviesFromXml_shouldContainAllGenres() {
-        for (Genre genre : Genre.values()) {
-            boolean containsGenre = movies.stream().anyMatch(m -> m.getGenres().contains(genre));
-            assertTrue(containsGenre, "Es fehlt ein Film mit dem Genre: " + genre);
-        }
+        assertEquals(maxSize, randomGenres.size(), "Die Genre-Liste sollte keine Duplikate haben.");
+        assertEquals(randomGenres.stream().distinct().count(), randomGenres.size(), "Die Genres sollten einzigartig sein.");
     }
 }
+
+
