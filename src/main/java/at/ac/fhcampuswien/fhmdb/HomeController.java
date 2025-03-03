@@ -18,6 +18,7 @@ import javafx.util.Duration;
 import javafx.application.Platform;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -34,82 +35,90 @@ public class HomeController implements Initializable {
     public JFXComboBox<String> genreComboBox;
     @FXML
     public JFXButton sortBtn;
+    @FXML
+    public JFXButton resetBtn;
 
-    private List<Movie> allMovies;
+    private List<Movie> allMovies = Movie.initializeMovies();
     private final ObservableList<Movie> observableMovies = FXCollections.observableArrayList();
-    private boolean ascending = true;
+    private boolean ascending = false;
     private boolean animationEnabled = true; // ⚡ Neue Option zum Deaktivieren der Animation für Tests
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        loadMovies(Movie.loadMoviesFromXml());
+        initializeMovies();
         setupUI();
+        if (animationEnabled) animateMovies();
     }
 
-    public void loadMovies(List<Movie> movies) {
-        this.allMovies = movies;
-        observableMovies.setAll(allMovies);
+    public void initializeMovies() {
+        observableMovies.addAll(allMovies);
         if (movieListView != null) {
             movieListView.setItems(observableMovies);
             movieListView.setCellFactory(movieListView -> new MovieCell());
         }
     }
 
+    public void loadMovies(List<Movie> movies) {
+        this.allMovies = movies;
+    }
+
     private void setupUI() {
-        if (genreComboBox != null) {
-            genreComboBox.getItems().add("Alle Genres");
-            for (Genre genre : Genre.values()) {
-                genreComboBox.getItems().add(genre.name());
-            }
-            genreComboBox.setValue("Alle Genres");
-            genreComboBox.setOnAction(event -> filterMovies());
-        }
 
         if (sortComboBox != null) {
             sortComboBox.getItems().addAll("Title", "Rating", "Release Year");
-            sortComboBox.setValue("Title");
+            sortComboBox.setPromptText("Sort movies");
             sortComboBox.setOnAction(event -> {
-                sortMovies();
-                if (animationEnabled) animateMovies();
+                ascending = false;
+                sortBtn.setText("Sort");
             });
         }
 
         if (sortBtn != null) {
-            sortBtn.setOnAction(event -> {
+            sortBtn.setOnMouseClicked(event -> {
                 ascending = !ascending;
-                sortMovies();
                 sortBtn.setText(ascending ? "Sort (Desc)" : "Sort (Asc)");
-                if (animationEnabled) animateMovies();
+                sortMovies();
             });
         }
 
         if (searchField != null) {
             searchField.textProperty().addListener((observable, oldValue, newValue) -> {
                 filterMovies();
-                if (animationEnabled) animateMovies();
             });
         }
 
-        if (animationEnabled) animateMovies();
+        resetBtn.setOnMouseClicked(event -> {
+            resetMovies();
+            if (animationEnabled) animateMovies();
+        });
+
+        if (genreComboBox != null) {
+            genreComboBox.getItems().add("ALL");
+            for (Genre genre : Genre.values()) {
+                genreComboBox.getItems().add(genre.name());
+            }
+            genreComboBox.setOnAction(event -> filterMovies());
+        }
     }
 
     public void sortMovies() {
-        if (sortComboBox == null) return;
+        if (sortComboBox == null  || sortComboBox.getValue() == null) return;
         MovieSorter.SortBy selectedSort = switch (sortComboBox.getValue()) {
             case "Rating" -> MovieSorter.SortBy.RATING;
             case "Release Year" -> MovieSorter.SortBy.RELEASE_YEAR;
             default -> MovieSorter.SortBy.TITLE;
         };
         MovieSorter.sortMovies(observableMovies, selectedSort, ascending);
+        if (animationEnabled) animateMovies();
     }
 
     public void filterMovies() {
         if (genreComboBox == null || searchField == null) return;
-        String selectedGenre = genreComboBox.getValue();
+        String selectedGenre = genreComboBox.getValue() == null ? "ALL" : genreComboBox.getValue();
         String searchQuery = searchField.getText().trim().toLowerCase();
 
         List<Movie> filtered = allMovies.stream()
-                .filter(movie -> selectedGenre.equals("Alle Genres") || movie.getGenres().contains(Genre.valueOf(selectedGenre)))
+                .filter(movie -> selectedGenre.equals("ALL") || movie.getGenres().contains(Genre.valueOf(selectedGenre)))
                 .filter(movie -> searchQuery.isEmpty() ||
                         movie.getTitle().toLowerCase().contains(searchQuery) ||
                         movie.getDescription().toLowerCase().contains(searchQuery))
@@ -117,7 +126,16 @@ public class HomeController implements Initializable {
 
         observableMovies.setAll(filtered);
         sortMovies();
-        if (animationEnabled) animateMovies();
+    }
+
+    public void resetMovies() {
+        ascending = true;
+        sortBtn.setText("Sort");
+        sortComboBox.getSelectionModel().clearSelection();
+        searchField.clear();
+        genreComboBox.getSelectionModel().clearSelection();
+        observableMovies.clear();
+        observableMovies.addAll(allMovies);
     }
 
     public void animateMovies() {
@@ -142,6 +160,14 @@ public class HomeController implements Initializable {
                 fade.play();
             }
         });
+    }
+
+    public List<Movie> getAllMovies() {
+        return allMovies;
+    }
+
+    public void setAllMovies(List<Movie> allMovies) {
+        this.allMovies = allMovies;
     }
 
     public ObservableList<Movie> getObservableMovies() {

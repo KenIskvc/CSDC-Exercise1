@@ -39,7 +39,7 @@
 
          <!-- Sort-Button für Asc/Desc -->
          <JFXButton fx:id="sortBtn"
-                    text="Sort (Asc)"
+                    text="Sort"
                     style="-fx-background-color: #F5C518; -fx-text-fill: black;" />
 
          <!-- Automatische Suche beim Tippen -->
@@ -52,6 +52,10 @@
                       promptText="Filter by Genre"
                       prefWidth="150.0"
                       style="-fx-background-color: #555555; -fx-text-fill: white;" />
+         <!-- Reset Button für das Zurücksetzen der Filter -->
+         <JFXButton fx:id="resetBtn"
+                    text="Reset"
+                    style="-fx-background-color: #F5C518; -fx-text-fill: black;" />
       </children>
    </HBox>
 

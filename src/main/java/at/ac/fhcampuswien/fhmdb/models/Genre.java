@@ -1,7 +1,5 @@
 package at.ac.fhcampuswien.fhmdb.models;
 
-
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +11,5 @@ public enum Genre {
 
     public static List<Genre> getGenres() {
         return Arrays.asList(values());
-
     }
 }
