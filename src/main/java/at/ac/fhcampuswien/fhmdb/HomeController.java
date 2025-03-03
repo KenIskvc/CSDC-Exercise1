@@ -7,6 +7,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
 import javafx.collections.FXCollections;
+import at.ac.fhcampuswien.fhmdb.models.Genre;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,10 +25,10 @@ public class HomeController implements Initializable {
     public TextField searchField;
 
     @FXML
-    public JFXListView movieListView;
+    public JFXListView<Movie> movieListView;
 
     @FXML
-    public JFXComboBox genreComboBox;
+    public JFXComboBox<String> genreComboBox;
 
     @FXML
     public JFXButton sortBtn;
@@ -47,6 +48,14 @@ public class HomeController implements Initializable {
         // TODO add genre filter items with genreComboBox.getItems().addAll(...)
 
 
+        // Genres zur ComboBox hinzufügen
+        genreComboBox.getItems().add("Alle Genres"); // Option zum Zurücksetzen
+        for (Genre genre : Genre.values()) {
+            genreComboBox.getItems().add(genre.name());
+        }
+
+        // Event für Genre-Auswahl hinzufügen
+        genreComboBox.setOnAction(event -> filterByGenre());
         genreComboBox.setPromptText("Filter by Genre");
 
         // TODO add event handlers to buttons and call the regarding methods
@@ -64,5 +73,19 @@ public class HomeController implements Initializable {
         });
 
 
+    }
+    private void filterByGenre() {
+        String selectedGenre = (String) genreComboBox.getValue();
+
+        if (selectedGenre == null || selectedGenre.equals("Alle Genres")) {
+            observableMovies.setAll(allMovies); // Kein Filter -> Alle Filme anzeigen
+        } else {
+            Genre genreFilter = Genre.valueOf(selectedGenre);
+            observableMovies.setAll(
+                    allMovies.stream()
+                            .filter(movie -> movie.getGenres().contains(genreFilter))
+                            .toList()
+            );
+        }
     }
 }
